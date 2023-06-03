@@ -41,7 +41,7 @@ dotnet ef database update
 ```
 ___
 
-### Terceiro Passo: Iniciar Aplicacao
+### Quarto Passo: Iniciar Aplicacao
 Apos o update da database execute o seguinte comando no mesmo terminal para iniciar a API:
 ```
 dotnet run
