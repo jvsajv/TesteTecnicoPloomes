@@ -13,9 +13,12 @@ namespace TesteTecnicoPloomes.Repositories
             _databaseContext = databaseContext;
         }
 
-        public async Task<List<User>> GetAllAsync()
+        public async Task<List<User>> GetAllAsync(int skip=0, int take=-1)
         {
-            return await _databaseContext.Users.ToListAsync();
+            if(take < 0){
+                return await _databaseContext.Users.Skip(skip).ToListAsync();
+            }
+            return await _databaseContext.Users.OrderBy(post => post.Id).Skip(skip).Take(take).ToListAsync();
         }
 
         public async Task<User> GetByIdAsync(int id)

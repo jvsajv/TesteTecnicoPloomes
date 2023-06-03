@@ -11,7 +11,7 @@ namespace TesteTecnicoPloomes.Data.Map
             try
             {
                 builder.HasKey(post => post.Id);
-                builder.Property(post => post.Title).IsRequired().HasMaxLength(16);
+                builder.Property(post => post.Title).IsRequired().HasMaxLength(100);
                 builder.Property(post => post.Body).IsRequired();
                 builder.Property(post => post.Public).IsRequired();
                 builder.Property(post => post.IdOwner).IsRequired();

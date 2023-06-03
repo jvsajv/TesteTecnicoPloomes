@@ -12,11 +12,8 @@ namespace TesteTecnicoPloomes.Models
         public int Id { get; set; }
         public string Title { get; set; }
         public string Body { get; set; }
-
-        [ForeignKey("Owner")]
+        [Key, ForeignKey("Owner")]
         public int IdOwner { get; set; }
-
-        [IgnoreDataMember]
         public User Owner { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

@@ -1,15 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
-using TesteTecnicoPloomes.Data;
 using TesteTecnicoPloomes.DTO;
-using TesteTecnicoPloomes.Repositories;
+using TesteTecnicoPloomes.Models;
 using TesteTecnicoPloomes.Repositories.Interfaces;
 
 namespace TesteTecnicoPloomes.Controllers
 {
-    [Route("v1/post")]
+    [Route("post")]
     [ApiController]
     public class PostController : ControllerBase
     {
@@ -25,11 +23,11 @@ namespace TesteTecnicoPloomes.Controllers
         [HttpGet]
         [Route("fetchAll")]
         [Authorize(Roles = "Admin, Editor")]
-        public async Task<ActionResult<dynamic>> FetchAllPosts()
+        public async Task<ActionResult<dynamic>> FetchAllPosts(int skip=0, int take=25)
         {
             try
             {
-                return Ok(new { posts = await _postRepository.GetAllAsync() });
+                return Ok(new { posts = await _postRepository.GetAllAsync(skip, take) });
             }
             catch (Exception ex)
             {
@@ -38,30 +36,38 @@ namespace TesteTecnicoPloomes.Controllers
         }
 
         [HttpGet]
-        [Route("/{id}")]
-        public async Task<ActionResult<dynamic>> FetchById(int id)
+        [Route("{idPost}")]
+        public async Task<ActionResult<dynamic>> FetchById(int idPost)
         {
             try
             {
-                var currentUser = User.Claims.FirstOrDefault(c => c.Type == "name").Value;
-
-                var post = await _postRepository.GetByIdAsync(id);
+                var currentUser = User?.Identity?.Name;
+                if (currentUser == null) {
+                    currentUser = "";
+                }
+                var post = await _postRepository.GetByIdAsync(idPost);
 
                 if (post == null) {
                     return BadRequest("There's no post with this ID");
                 }
-                else if (post.Owner.Username == currentUser || post.Public)
+                else if (post.Public)
                 {
-                    return Ok(new { posts = await _postRepository.GetByIdAsync(id) });
+                    return Ok(post); 
                 }
-                else
+                else if (currentUser != null )
                 {
-                    return Unauthorized(new
+                    if(post.Owner.Username.Equals(currentUser)) { 
+                        return Ok(post); 
+                    }
+                    
+                }
+
+                return Unauthorized(new
                     {
                         message = "You are not authorized to see this post.",
                         cause = "Not authorized role or Post is not public."
                     });
-                }
+                
             }
             catch (Exception ex)
             {
@@ -71,11 +77,11 @@ namespace TesteTecnicoPloomes.Controllers
 
         [HttpGet]
         [Route("fetchPublic")]
-        public async Task<ActionResult<dynamic>> FetchPublicPosts()
+        public async Task<ActionResult<dynamic>> FetchPublicPosts(int skip=0, int take=25)
         {
             try
             {
-                return Ok(new { posts = _postRepository.GetPublic() });
+                return Ok(_postRepository.GetPublic(skip, take));
             }
             catch (Exception ex)
             {
@@ -85,10 +91,10 @@ namespace TesteTecnicoPloomes.Controllers
 
         [HttpGet]
         [Route("fetchOwn")]
-        [Authorize]
-        public async Task<ActionResult<dynamic>> FetchOwnPosts()
+        [Authorize(Roles ="Admin, Publisher, Editor")]
+        public async Task<ActionResult<dynamic>> FetchOwnPosts(int skip=0, int take=25)
         {
-            var currentUser = User.Claims.FirstOrDefault(c => c.Type == "name").Value;
+            var currentUser = User.Identity.Name;
             try
             {
                 var user = (from c
@@ -96,7 +102,7 @@ namespace TesteTecnicoPloomes.Controllers
                             where c.Username.Equals(currentUser)
                             select c).SingleOrDefault();
 
-                return Ok(new { posts = _postRepository.GetOwn(user) });
+                return Ok(new { posts = _postRepository.GetOwn(user, skip, take) });
             }
             catch (Exception ex)
             {
@@ -112,7 +118,7 @@ namespace TesteTecnicoPloomes.Controllers
 
             try
             {
-                var currentUser = User.Claims.FirstOrDefault(c => c.Type == "name").Value;
+                var currentUser = User.Identity.Name;
 
                 var user = (from c
                                     in await _userRepository.GetAllAsync()
@@ -127,7 +133,7 @@ namespace TesteTecnicoPloomes.Controllers
                 {
                     return BadRequest("There's already a post with that title");
                 }
-
+                post = new Post();
                 post.Title = postDTO.Title;
                 post.Body = postDTO.Body;
                 post.Public = postDTO.Public;
@@ -135,9 +141,47 @@ namespace TesteTecnicoPloomes.Controllers
                 post.UpdatedAt = DateTime.Now;
                 post.Owner = user;
 
-                await _postRepository.Add(post);
+                post = await _postRepository.Add(post);
 
-                return Ok(new { post });
+                return Ok(post);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("{postId}/delete")]
+        [Authorize(Roles = "Admin, Publisher, Editor")]
+        public async Task<ActionResult<dynamic>> DeletePost(int postId)
+        {
+            var currentUser = User.Identity.Name;
+            var isPublisher = User.IsInRole("Publisher");
+            try
+            {
+                var user = (from c
+                                    in await _userRepository.GetAllAsync()
+                            where c.Username.Equals(currentUser)
+                            select c).SingleOrDefault();
+
+                var post = await _postRepository.GetByIdAsync(postId);
+
+                if (post == null)
+                {
+                    return BadRequest("There's no post with this ID");
+                }
+                else if (isPublisher && post.Owner != user)
+                {
+                    return Unauthorized("You can't delet this post");
+                } else
+                {
+                   
+
+                    await _postRepository.DeleteByIdAsync(postId);
+
+                    return Ok( new {message = "Post deleted succefully!"} );
+                }
             }
             catch (Exception ex)
             {
@@ -150,8 +194,8 @@ namespace TesteTecnicoPloomes.Controllers
         [Authorize(Roles = "Admin, Publisher, Editor")]
         public async Task<ActionResult<dynamic>> UpdatePost(int id, [FromBody] PostDTO postDTO)
         {
-            var currentUser = User.Claims.FirstOrDefault(c => c.Type == "name").Value;
-            var currentRole = User.Claims.FirstOrDefault(c => c.Type == "role").Value;
+            var currentUser = User.Identity.Name;
+            var isPublisher = User.IsInRole("Publisher");
             try
             {
                 var user = (from c
@@ -165,10 +209,11 @@ namespace TesteTecnicoPloomes.Controllers
                 {
                     return BadRequest("There's no post with this ID");
                 }
-                else if (currentRole == "Publisher" && post.Owner != user)
+                else if (isPublisher && post.Owner != user)
                 {
                     return Unauthorized("You can't edit this post");
-                } else
+                }
+                else
                 {
                     post.Title = postDTO.Title;
                     post.Body = postDTO.Body;

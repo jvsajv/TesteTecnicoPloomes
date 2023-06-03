@@ -13,7 +13,7 @@ using TesteTecnicoPloomes.Services;
 namespace TesteTecnicoPloomes.Controllers
 {
 
-    [Route("v1")]
+    [Route("auth")]
     [ApiController]
     public class AuthController : ControllerBase
     {

@@ -10,7 +10,6 @@ namespace TesteTecnicoPloomes.Models
         public string Username { get; set; }
         public string Password { get; set; }
         public RoleUser Role { get; set; }
-
         public ICollection<Post> Posts { get; }
 
     }

@@ -9,7 +9,7 @@ using TesteTecnicoPloomes.Repositories.Interfaces;
 
 namespace TesteTecnicoPloomes.Controllers
 {
-    [Route("v1/user")]
+    [Route("user")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -23,7 +23,7 @@ namespace TesteTecnicoPloomes.Controllers
         [HttpGet]
         [Route("fetchAll")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<dynamic>> FetchAllUsers()
+        public async Task<ActionResult<dynamic>> FetchAllUsers(int skip=0, int take=25)
         {
             try
             {
@@ -35,13 +35,13 @@ namespace TesteTecnicoPloomes.Controllers
         }
 
         [HttpGet]
-        [Route("/{id}")]
+        [Route("{idUser}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<dynamic>> FetchUserById(int id)
+        public async Task<ActionResult<dynamic>> FetchUserById(int idUser)
         {
             try
             {
-                return Ok(await _userRepository.GetByIdAsync(id));
+                return Ok(await _userRepository.GetByIdAsync(idUser));
             }
             catch (Exception ex)
             {
@@ -50,28 +50,25 @@ namespace TesteTecnicoPloomes.Controllers
         }
 
         [HttpPost]
-        [Route("resetPassword")]
+        [Route("{idUser}/resetPassword")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<dynamic>> ResetUserPassword([FromBody] string username)
+        public async Task<ActionResult<dynamic>> ResetUserPassword(int idUser)
         {
             ScryptEncoder encoder = new ScryptEncoder();
 
             DatabaseContext db = new DatabaseContext();
 
-            var user = (from c
-                                     in await _userRepository.GetAllAsync()
-                        where c.Username.Equals(username)
-                        select c).SingleOrDefault();
+            var user = await _userRepository.GetByIdAsync(idUser);
 
 
-            if (user != null)
+            if (user == null)
             {
-                return BadRequest(new { message = "Unable to find user "+ username });
+                return BadRequest(new { message = "Unable to find user" });
             }
             else
             {
                
-                var password = encoder.Encode(username);
+                var password = encoder.Encode(user.Username);
 
                 try
                 {
@@ -90,34 +87,27 @@ namespace TesteTecnicoPloomes.Controllers
         }
 
         [HttpPost]
-        [Route("updateRole")]
+        [Route("{idUser}/updateToRole")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<dynamic>> UpdateUserRole([FromBody] string username, RoleUser role)
+        public async Task<ActionResult<dynamic>> UpdateUserRole(int idUser, RoleUser role)
         {
 
             DatabaseContext db = new DatabaseContext();
 
-            var user = (from c
-                                     in await _userRepository.GetAllAsync()
-                        where c.Username.Equals(username)
-                        select c).SingleOrDefault();
+            var user = await _userRepository.GetByIdAsync(idUser);
 
 
-            if (user != null)
+            if (user == null)
             {
-                return BadRequest(new { message = "Unable to find user " + username });
+                return BadRequest(new { message = "Unable to find user"});
             }
             else
             {
-
-                
 
                 try
                 {
                     user.Role = role;
                     await _userRepository.Update(user);
-
-                    await db.SaveChangesAsync();
 
                     return Ok(new { message = "Role Updated Succefully" });
                 }

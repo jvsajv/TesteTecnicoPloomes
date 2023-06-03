@@ -22,6 +22,7 @@ builder.Services.AddEntityFrameworkSqlServer()
         options => options.UseSqlServer(builder.Configuration.GetConnectionString("Database"))
     );
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
 
 var key = Encoding.ASCII.GetBytes(Configuration.GetValue<string>("Jwt:Key"));
 builder.Services.AddAuthentication(options =>
@@ -43,6 +44,11 @@ builder.Services.AddAuthentication(options =>
     });
 builder.Services.AddMvc();
 builder.Services.AddControllers();
+
+builder.Services.AddControllersWithViews()
+    .AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
 
 var app = builder.Build();
 

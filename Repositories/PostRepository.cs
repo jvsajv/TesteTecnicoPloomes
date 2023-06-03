@@ -12,9 +12,12 @@ namespace TesteTecnicoPloomes.Repositories
         {
             _databaseContext = databaseContext;
         }
-        public async Task<List<Post>> GetAllAsync()
+        public async Task<List<Post>> GetAllAsync(int skip=0, int take=-1)
         {
-            return await _databaseContext.Posts.ToListAsync();
+            if(take < 0){
+                return await _databaseContext.Posts.Skip(skip).ToListAsync();
+            }
+            return await _databaseContext.Posts.OrderBy(post => post.Id).Skip(skip).Take(take).ToListAsync();
         }
 
         public async Task<Post> GetByIdAsync(int id)
@@ -27,13 +30,13 @@ namespace TesteTecnicoPloomes.Repositories
                 throw new Exception(ex.Message);
             }
         }
-        public List<Post> GetPublic()
+        public List<Post> GetPublic(int skip, int take)
         {
-            return _databaseContext.Posts.Where(post => post.Public).ToList();
+            return _databaseContext.Posts.Where(post => post.Public).OrderBy(post => post.Id).Skip(skip).Take(take).ToList();
         }
-        public List<Post> GetOwn(User user)
+        public List<Post> GetOwn(User user, int skip, int take)
         {
-            return _databaseContext.Posts.Where(post => post.Owner == user).ToList();
+            return _databaseContext.Posts.Where(post => post.Owner == user).OrderBy(post => post.Id).Skip(skip).Take(take).ToList();
         }
       
         public async Task<Post> Add(Post post)
