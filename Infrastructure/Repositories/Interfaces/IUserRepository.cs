@@ -1,6 +1,6 @@
 ﻿using TesteTecnicoPloomes.Models;
 
-namespace TesteTecnicoPloomes.Repositories.Interfaces
+namespace TesteTecnicoPloomes.Infrastructure.Repositories.Interfaces
 {
     public interface IUserRepository
     {

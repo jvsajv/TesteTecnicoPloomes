@@ -1,16 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.IdentityModel.Tokens;
 using Scrypt;
-using TesteTecnicoPloomes.Data;
 using TesteTecnicoPloomes.DTO;
 using TesteTecnicoPloomes.Enums;
+using TesteTecnicoPloomes.Infrastructure.Data;
+using TesteTecnicoPloomes.Infrastructure.Repositories.Interfaces;
 using TesteTecnicoPloomes.Models;
-using TesteTecnicoPloomes.Repositories;
-using TesteTecnicoPloomes.Repositories.Interfaces;
 using TesteTecnicoPloomes.Services;
 
-namespace TesteTecnicoPloomes.Controllers
+namespace TesteTecnicoPloomes.Application.Controllers
 {
 
     [Route("auth")]
@@ -30,7 +27,7 @@ namespace TesteTecnicoPloomes.Controllers
         public async Task<ActionResult<dynamic>> AuthenticateAsync([FromBody] UserDTO model)
         {
             ScryptEncoder encoder = new ScryptEncoder();
-            
+
             var authenticated = (from c
                                      in await _userRepository.GetAllAsync()
                                  where c.Username.Equals(model.Username)
@@ -44,9 +41,10 @@ namespace TesteTecnicoPloomes.Controllers
                     var token = TokenService.GenerateToken(authenticated);
                     authenticated.Password = "";
 
-                    return Ok(new {
+                    return Ok(new
+                    {
                         user = authenticated.Username,
-                        token = token
+                        token
                     });
                 }
             }
@@ -63,8 +61,8 @@ namespace TesteTecnicoPloomes.Controllers
 
             var user = (from c
                                      in await _userRepository.GetAllAsync()
-                                 where c.Username.Equals(model.Username)
-                                 select c).SingleOrDefault();
+                        where c.Username.Equals(model.Username)
+                        select c).SingleOrDefault();
 
 
             if (user != null)
@@ -83,7 +81,8 @@ namespace TesteTecnicoPloomes.Controllers
                     await _userRepository.Add(newUser);
 
                     return Ok(new { message = "Registered Succefully" });
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     throw new Exception(ex.Message);
                 }

@@ -2,12 +2,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Scrypt;
-using TesteTecnicoPloomes.Data;
 using TesteTecnicoPloomes.Enums;
+using TesteTecnicoPloomes.Infrastructure.Data;
+using TesteTecnicoPloomes.Infrastructure.Repositories.Interfaces;
 using TesteTecnicoPloomes.Models;
-using TesteTecnicoPloomes.Repositories.Interfaces;
 
-namespace TesteTecnicoPloomes.Controllers
+namespace TesteTecnicoPloomes.Application.Controllers
 {
     [Route("user")]
     [ApiController]
@@ -23,12 +23,13 @@ namespace TesteTecnicoPloomes.Controllers
         [HttpGet]
         [Route("fetchAll")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<dynamic>> FetchAllUsers(int skip=0, int take=25)
+        public async Task<ActionResult<dynamic>> FetchAllUsers(int skip = 0, int take = 25)
         {
             try
             {
                 return Ok(new { users = await _userRepository.GetAllAsync() });
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -67,7 +68,7 @@ namespace TesteTecnicoPloomes.Controllers
             }
             else
             {
-               
+
                 var password = encoder.Encode(user.Username);
 
                 try
@@ -99,7 +100,7 @@ namespace TesteTecnicoPloomes.Controllers
 
             if (user == null)
             {
-                return BadRequest(new { message = "Unable to find user"});
+                return BadRequest(new { message = "Unable to find user" });
             }
             else
             {

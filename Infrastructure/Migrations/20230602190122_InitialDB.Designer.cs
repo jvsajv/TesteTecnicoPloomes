@@ -2,18 +2,16 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TesteTecnicoPloomes.Data;
+using TesteTecnicoPloomes.Infrastructure.Data;
 
 #nullable disable
 
-namespace TesteTecnicoPloomes.Migrations
+namespace TesteTecnicoPloomes.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230603061956_roleFix")]
-    partial class roleFix
+    [Migration("20230602190122_InitialDB")]
+    partial class InitialDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -47,8 +45,8 @@ namespace TesteTecnicoPloomes.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");

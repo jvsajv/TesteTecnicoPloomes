@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TesteTecnicoPloomes.Data;
+using TesteTecnicoPloomes.Infrastructure.Data;
+using TesteTecnicoPloomes.Infrastructure.Repositories.Interfaces;
 using TesteTecnicoPloomes.Models;
-using TesteTecnicoPloomes.Repositories.Interfaces;
 
 namespace TesteTecnicoPloomes.Repositories
 {

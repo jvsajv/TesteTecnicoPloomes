@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TesteTecnicoPloomes.Data;
+using TesteTecnicoPloomes.Infrastructure.Data;
+using TesteTecnicoPloomes.Infrastructure.Repositories.Interfaces;
 using TesteTecnicoPloomes.Models;
-using TesteTecnicoPloomes.Repositories.Interfaces;
 
-namespace TesteTecnicoPloomes.Repositories
+namespace TesteTecnicoPloomes.Infrastructure.Repositories
 {
     public class PostRepository : IPostRepository
     {

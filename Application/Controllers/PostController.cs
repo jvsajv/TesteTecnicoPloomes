@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
-using TesteTecnicoPloomes.DTO;
+using TesteTecnicoPloomes.Application.DTO;
+using TesteTecnicoPloomes.Infrastructure.Repositories.Interfaces;
 using TesteTecnicoPloomes.Models;
-using TesteTecnicoPloomes.Repositories.Interfaces;
 
-namespace TesteTecnicoPloomes.Controllers
+namespace TesteTecnicoPloomes.Application.Controllers
 {
     [Route("post")]
     [ApiController]
@@ -77,7 +77,7 @@ namespace TesteTecnicoPloomes.Controllers
 
         [HttpGet]
         [Route("fetchPublic")]
-        public async Task<ActionResult<dynamic>> FetchPublicPosts(int skip=0, int take=25)
+        public ActionResult<dynamic> FetchPublicPosts(int skip = 0, int take = 25)
         {
             try
             {

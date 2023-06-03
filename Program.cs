@@ -2,9 +2,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using TesteTecnicoPloomes.Data;
+using TesteTecnicoPloomes.Infrastructure.Data;
+using TesteTecnicoPloomes.Infrastructure.Repositories;
+using TesteTecnicoPloomes.Infrastructure.Repositories.Interfaces;
 using TesteTecnicoPloomes.Repositories;
-using TesteTecnicoPloomes.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

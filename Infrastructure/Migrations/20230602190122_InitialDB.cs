@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace TesteTecnicoPloomes.Migrations
+namespace TesteTecnicoPloomes.Infrastructure.Migrations
 {
     public partial class InitialDB : Migration
     {

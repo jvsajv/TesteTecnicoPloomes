@@ -1,4 +1,4 @@
-﻿namespace TesteTecnicoPloomes.DTO
+﻿namespace TesteTecnicoPloomes.Application.DTO
 {
     public class PostDTO
     {

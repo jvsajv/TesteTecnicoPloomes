@@ -1,8 +1,8 @@
 # API Blog Simples
 
-Essa aplicacao disponibiliza uma API RESTful com os seguintes
+Essa aplicacao disponibiliza uma API RESTful com os alguns ecursos disponíveis para acesso.
 
-Recursos disponíveis para acesso:
+*Para organizacao etrutural do codigo foi utilizada uma adaptacao de DDD (Domain-Driven Design)*
 
 ## Configurando o Ambiente
 

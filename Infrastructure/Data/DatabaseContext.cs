@@ -2,7 +2,7 @@
 using TesteTecnicoPloomes.Data.Map;
 using TesteTecnicoPloomes.Models;
 
-namespace TesteTecnicoPloomes.Data
+namespace TesteTecnicoPloomes.Infrastructure.Data
 {
     public class DatabaseContext : DbContext
     {
